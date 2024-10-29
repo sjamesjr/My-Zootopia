@@ -27,8 +27,13 @@ def serialize_animal(animal_obj):
     return output
 
 
-output = ''
+serial_output = ''
 for animal in animals_data:
-    output += serialize_animal(animal)
+    serial_output += serialize_animal(animal)
 
-print(output)
+with open("animals_template.html", "r") as file:
+    content = file.read()
+    new_content = content.replace("__REPLACE_ANIMALS_INFO__", serial_output)
+
+with open("animals.html", "w") as file2:
+    file2.write(new_content)
