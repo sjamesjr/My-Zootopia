@@ -2,16 +2,6 @@ import IPython
 import requests
 import json
 
-#
-#
-# def load_data(file_path):
-#     """ Loads a JSON file """
-#     with open(file_path, "r") as handle:
-#         return json.load(handle)
-#
-#
-# animals_data = load_data('animals_data.json')
-
 
 def serialize_animal(animal_obj):
     output = ''
@@ -38,9 +28,12 @@ def main():
     response = requests.get(url, params=params, headers=header)
     data = response.json()
 
-    serial_output = ''
-    for animal in data:
-        serial_output += serialize_animal(animal)
+    if data:
+        serial_output = ''
+        for animal in data:
+            serial_output += serialize_animal(animal)
+    else:
+        serial_output = f'<h2>The animal "{user_input}" doesn\'t exist.</h2>'
 
     with open("animals_template.html", "r") as file:
         content = file.read()
