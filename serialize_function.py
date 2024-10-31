@@ -1,6 +1,7 @@
 import data_fetcher
 
 
+
 def serialize_animal(animal_obj):
     output = ''
     output += '<li class="cards__item">\n'
@@ -20,11 +21,6 @@ def serialize_animal(animal_obj):
 
 def main():
     user_input = input("Enter the name of an animal: ")
-    # url = "https://api.api-ninjas.com/v1/animals"
-    # params = {"name": {user_input}}
-    # header = {"X-Api-Key": "L/K6XFChAP081dYR34/DsA==49HJZUygpquvzVDn"}
-    # response = requests.get(url, params=params, headers=header)
-    # data = response.json()
     data = data_fetcher.fetch_data(user_input)
 
     if data:
