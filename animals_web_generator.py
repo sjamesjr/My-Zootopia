@@ -1,65 +1,70 @@
-import json
+import data_fetcher
 
 
-def load_data(file_path):
-    """Loads data from a JSON file.
+def serialize_animal(animal_obj):
+    """Generates HTML for a single animal's information.
 
-    Args:
-        file_path (str): The path to the JSON file to load.
-
-    Returns:
-        dict: The loaded JSON data.
-    """
-    with open(file_path, "r") as handle:
-        return json.load(handle)
-
-
-# Load data from JSON file
-animals_data = load_data('animals_data.json')
-
-
-def print_animal_info(animals_data):
-    """Generates HTML for each animal's information.
-
-    Iterates through the provided data and constructs HTML list items
-    containing the name, diet, type, and primary location of each animal.
+    Creates an HTML list item displaying the name, diet, type, and primary
+    location of the specified animal.
 
     Args:
-        animals_data (list): A list of dictionaries, each representing an animal.
+        animal_obj (dict): Dictionary containing animal data.
 
     Returns:
-        str: The generated HTML content for each animal.
+        str: The HTML string for the animal's information.
     """
     output = ''  # Initialize an empty string to accumulate HTML content
 
-    for animal in animals_data:
-        # Append the name and characteristics of each animal to the output string
-        output += '<li class="cards__item">'
-        output += f'<div class="card__title"> {animal["name"]}</div>\n'
-        output += '  <p class="card__text">\n'
-        output += f"<strong>Diet:</strong> {animal['characteristics']['diet']}<br/>\n"
+    # Add animal name
+    output += '<li class="cards__item">\n'
+    output += f'<div class="card__title">{animal_obj["name"]}</div>\n'
+    output += '  <p class="card__text">\n'
 
-        # Check if 'type' exists in characteristics; if not, add a placeholder
-        if 'type' in animal['characteristics']:
-            output += f"<strong>Type:</strong> {animal['characteristics']['type']}<br/>\n"
-        else:
-            output += "<strong>Type:</strong> N/A <br/>\n"
+    # Add diet information
+    output += f"<strong>Diet:</strong> {animal_obj['characteristics']['diet']}<br/>\n"
 
-        # Add the first location associated with the animal
-        output += f"<strong>Location:</strong> {animal['locations'][0]}<br/>\n"
-        output += '</p>\n'
-        output += '</li>'
+    # Add type information, or a placeholder if type is missing
+    if 'type' in animal_obj['characteristics']:
+        output += f"<strong>Type:</strong> {animal_obj['characteristics']['type']}<br/>\n"
+    else:
+        output += "<strong>Type:</strong> N/A <br/>\n"
+
+    # Add primary location information
+    output += f"<strong>Location:</strong> {animal_obj['locations'][0]}<br/>\n"
+    output += '</p>\n'
+    output += '</li>'
 
     return output
 
 
-# Open the template file and replace the placeholder with generated animal info
-with open("animals_template.html", "r") as file:
-    content = file.read()
-    animal_info = print_animal_info(animals_data)
-    new_content = content.replace("__REPLACE_ANIMALS_INFO__", animal_info)
+def main():
+    """Main function to handle user input and generate HTML output.
 
-# Write the updated content to a new HTML file
-with open("animals.html", "w") as file2:
-    file2.write(new_content)
+    Prompts the user for an animal name, retrieves data for that animal using
+    data_fetcher, and generates HTML output based on the retrieved data.
+    """
+    user_input = input("Enter the name of an animal: ")
+    data = data_fetcher.fetch_data(user_input)
+
+    # Check if data is returned and serialize it; otherwise, display an error message
+    if data:
+        serial_output = ''
+        for animal in data:
+            serial_output += serialize_animal(animal)
+    else:
+        serial_output = f'<h2>The animal "{user_input}" doesn\'t exist.</h2>'
+
+    # Load HTML template and replace placeholder with serialized animal info
+    with open("animals_template.html", "r") as file:
+        content = file.read()
+        new_content = content.replace("__REPLACE_ANIMALS_INFO__", serial_output)
+
+    # Write the final content to an output HTML file
+    with open("animals.html", "w") as file2:
+        file2.write(new_content)
     print("Website was successfully generated to the file animals.html.")
+
+
+# Execute main function if this file is run as a script
+if __name__ == "__main__":
+    main()
